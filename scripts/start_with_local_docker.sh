@@ -10,10 +10,12 @@ certthumbprint=$(openssl x509 -in ${SCRIPT_DIR}/../tests/NLoop.Server.Tests/data
 
 LOGGING__LogLevel__Microsoft=Information
 
-dotnet run --project NLoop.Server -- \
+
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project NLoop.Server -- \
   --network RegTest \
   --nohttps true \
   --btc.lightningconnectionstring "type=lnd-rest;macaroonfilepath="$admin_macaroon";server=https://localhost:32736;certthumbprint="$certthumbprint"" \
+  --eventstoreurl tcp://admin:changeit@localhost:1113 \
   --boltzhost https://localhost \
   --boltzport 6028 \
   --boltzhttps false

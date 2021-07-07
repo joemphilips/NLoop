@@ -180,6 +180,12 @@ module NLoopServerCommandLine =
         a.Arity <- ArgumentArity.ZeroOrOne
         a
       o
+      let o = Option<int64>($"--{nameof(NLoopOptions.Instance.MinimumSwapAmountSatoshis).ToLowerInvariant()}", $"Minimum Swap amount we can perform. (default: {NLoopOptions.Instance.MinimumSwapAmountSatoshis})")
+      o.Argument <-
+        let a = Argument<int64>()
+        a.Arity <- ArgumentArity.ZeroOrOne
+        a
+      o
       let o = Option<bool>($"--{nameof(NLoopOptions.Instance.AcceptZeroConf).ToLowerInvariant()}", "Whether we want to accept zero conf")
       o.Argument <-
         let a = Argument<bool>()
@@ -219,6 +225,14 @@ module NLoopServerCommandLine =
       let o = Option<bool>($"--boltzhttps", $"Whether to use https for the boltz server or not (default: {Constants.DefaultBoltzHttps})")
       o.Argument <-
         let a = Argument<bool>()
+        a.Arity <- ArgumentArity.ZeroOrOne
+        a
+      o
+
+      let o = Option<string>([|$"--{nameof(NLoopOptions.Instance.EventStoreUrl).ToLowerInvariant()}";|],
+                             $"Url for your eventstore db. (default: {NLoopOptions.Instance.EventStoreUrl})")
+      o.Argument <-
+        let a = Argument<string>()
         a.Arity <- ArgumentArity.ZeroOrOne
         a
       o

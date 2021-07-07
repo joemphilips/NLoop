@@ -15,6 +15,8 @@ open System.Runtime.CompilerServices
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open NLoop.Server.Actors
+open NLoop.Server.ProcessManagers
+open NLoop.Server.Projections
 
 [<AbstractClass;Sealed;Extension>]
 type NLoopExtensions() =
@@ -53,6 +55,18 @@ type NLoopExtensions() =
           .AddSingleton<IHostedService>(fun p ->
             p.GetRequiredService<IRepositoryProvider>() :?> RepositoryProvider :> IHostedService
           )
+          .AddSingleton<ISwapEventListener, BoltzListener>()
+          .AddSingleton<IHostedService>(fun p ->
+            p.GetRequiredService<ISwapEventListener>() :?> BoltzListener :> IHostedService
+          )
+          .AddSingleton<ISwapEventListener, BlockchainListener>()
+          .AddSingleton<IHostedService>(fun p ->
+            p.GetRequiredService<ISwapEventListener>() :?> BlockchainListener :> IHostedService
+          )
+          .AddSingleton<SwapStateProjection>()
+          .AddSingleton<IHostedService>(fun p ->
+            p.GetRequiredService<SwapStateProjection>() :> IHostedService
+          )
         |> ignore
 
       this
@@ -65,12 +79,16 @@ type NLoopExtensions() =
             u.Uri
         )
         |> ignore
+      this.AddSignalR() |> ignore
+
       this
+        .AddSingleton<ICheckpointDB, FlatFileCheckpointDB>()
         .AddSingleton<IBroadcaster, BitcoinRPCBroadcaster>()
         .AddSingleton<IFeeEstimator, BoltzFeeEstimator>()
         .AddSingleton<IUTXOProvider, BitcoinUTXOProvider>()
-        .AddSingleton<GetChangeAddress>(fun sp -> sp.GetRequiredService<ILightningClientProvider>().AsChangeAddressGetter())
-        .AddSingleton<EventAggregator>()
-        .AddHostedService<SwapEventListener>()
+        .AddSingleton<GetAddress>(fun sp -> sp.GetRequiredService<ILightningClientProvider>().AsChangeAddressGetter())
+        .AddSingleton<IEventAggregator, ReactiveEventAggregator>()
         .AddSingleton<SwapActor>()
+        .AddSingleton<SwapProcessManager>()
+        .AddHostedService<BlockchainListener>()
 
