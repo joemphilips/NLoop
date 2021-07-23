@@ -18,8 +18,8 @@ jobs:
         include:
           - os: ubuntu-18.04
             RID: linux-x64
-          - os: windows-latest
-            RID: win-x64
+          #- os: windows-latest
+          #  RID: win-x64
           - os: macos-latest
             RID: osx-x64
       fail-fast: true
